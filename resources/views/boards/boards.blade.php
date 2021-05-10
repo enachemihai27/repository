@@ -20,7 +20,7 @@
             <div class="card-header">
                 <h3 class="card-title">Boards Table</h3>
             </div>
-            <!-- /.card-header -->
+            
             <div class="card-body">
                 <table class="table table-bordered">
                     <thead>
@@ -56,12 +56,27 @@
                     </tbody>
                 </table>
             </div>
+              
+              <div class="card-footer clearfix">
+                    <ul class="pagination pagination-sm m-0 float-right">
+                        @if ($boards->currentPage() > 1)
+                            <li class="page-item"><a class="page-link" href="{{$boards->previousPageUrl()}}">&laquo;</a></li>
+                            <li class="page-item"><a class="page-link" href="{{$boards->url(1)}}">1</a></li>
+                        @endif
 
+                        @if ($boards->currentPage() < $boards->lastPage() )
+                            <li class="page-item"><a class="page-link" href="{{$boards->url($boards->lastPage())}}">{{$boards->lastPage()}}</a></li>
+                            <li class="page-item"><a class="page-link" href="{{$boards->nextPageUrl()}}">&raquo;</a></li>
+                        @endif
+                    </ul>
+                </div>
+        </div>
+        
             
-                </ul>
-            </div>
-        </div> -->
-        <!-- /.card -->
+                
+        
+    </section> 
+    
 
 
 
