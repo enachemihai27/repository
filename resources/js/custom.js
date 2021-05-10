@@ -6,7 +6,7 @@ $('#edit-modal').on('shown.bs.modal', function (event) {
     let user = button.data('user');
     
     
-    console.log(user.id);
+  
     
 
     let modal = $(this);
