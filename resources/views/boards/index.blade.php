@@ -11,7 +11,9 @@
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="{{route('dashboard')}}">Dashboard</a></li>
-                        <li class="breadcrumb-item active">Boards</li>
+                        <li class="breadcrumb-item active">Boards    </li>
+                        
+                        
                     </ol>
                 </div>
             </div>
@@ -26,15 +28,6 @@
             <div class="card-header">
                 <h3 class="card-title">Boards list</h3>
             </div>
-
-            @if (session('success'))
-                <div class="alert alert-success" role="alert">{{session('success')}}</div>
-            @endif
-
-            @if (session('error'))
-                <div class="alert alert-danger" role="alert">{{session('error')}}</div>
-            @endif
-
 
             <div class="card-body">
                 <table class="table table-bordered">
@@ -52,27 +45,29 @@
                             <tr>
                                 <td>{{$board->id}}</td>
                                 <td>
-                                    <a href="{{route('tasks.all', ['id' => $board->id])}}" class="link">{{$board->name}}</a>
+                                    <a href="{{route('board.view', ['id' => $board->id])}}" class="link">{{$board->name}}</a>
                                 </td>
                                 <td>{{$board->user->name}}</td>
                                 <td>
                                     {{count($board->boardUsers)}}
                                 </td>
                                 <td>
-                                    <div class="btn-group">
-                                        <button class="btn btn-xs btn-primary"
-                                                type="button"
-                                                data-board="{{json_encode($board)}}"
-                                                data-toggle="modal"
-                                                data-target="#boardEditModal">
-                                            <i class="fas fa-edit"></i></button>
-                                        <button class="btn btn-xs btn-danger"
-                                                type="button"
-                                                data-board="{{json_encode($board)}}"
-                                                data-toggle="modal"
-                                                data-target="#boardDeleteModal">
-                                            <i class="fas fa-trash"></i></button>
-                                    </div>
+                                    @if ($board->user->id === \Illuminate\Support\Facades\Auth::user()->id || \Illuminate\Support\Facades\Auth::user()->role === \App\Models\User::ROLE_ADMIN)
+                                        <div class="btn-group">
+                                            <button class="btn btn-sm btn-primary"
+                                                    type="button"
+                                                    data-board="{{json_encode($board)}}"
+                                                    data-toggle="modal"
+                                                    data-target="#boardEditModal">
+                                                <i class="fas fa-edit"></i></button>
+                                            <button class="btn btn-sm btn-danger"
+                                                    type="button"
+                                                    data-board="{{json_encode($board)}}"
+                                                    data-toggle="modal"
+                                                    data-target="#boardDeleteModal">
+                                                <i class="fas fa-trash"></i></button>
+                                        </div>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach
@@ -111,6 +106,14 @@
                     @endif
                 </ul>
             </div>
+            @if (\Illuminate\Support\Facades\Auth::user()->role === \App\Models\User::ROLE_ADMIN)
+                <button class="btn btn-sm btn-primary create-btn" style="width: 120px"
+                                                        type="button"                                                
+                                                        data-toggle="modal"
+                                                        data-target="#boardCreateModal">
+                                                        Create board
+                </button>
+            @endif
         </div>
         <!-- /.card -->
 
@@ -125,16 +128,18 @@
                     </div>
                     <div class="modal-body">
                         <div class="alert alert-danger hidden" id="boardEditAlert"></div>
-                        <div id="boardEditName"></div>
-                        <input type="hidden" id=boardEditId value="" />
+                        <input type="hidden" id="boardEditId" value="" />
                         <div class="form-group">
-                            <label for="newName">Name</label>
-                            <input type="text" class="form-control" id="newName" placeholder="" />
-
-                            <label for="boardUsers">Users assigned to board</label>
-                            <input type="text" class="form-control" id="boardUsers" placeholder="" />
-
-                        
+                            <label for="boardEditName">Name</label>
+                            <input type="text" class="form-control" id="boardEditName" placeholder="Name">
+                        </div>
+                        <div class="form-group">
+                            <label for="boardEditUsers">Board Users</label>
+                            <select class="select2bs4" multiple="multiple" data-placeholder="Select board users" id="boardEditUsers" style="width: 100%;">
+                                @foreach ($userList as $user)
+                                    <option value="{{$user['id']}}">{{$user['name']}}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                     <div class="modal-footer justify-content-between">
@@ -167,6 +172,40 @@
                 <!-- /.modal-content -->
             </div>
             <!-- /.modal-dialog -->
+        </div>
+
+        <div class="modal fade" id="boardCreateModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Create new board</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-danger hidden" id="boardCreateAlert"></div>
+                        
+                        <div class="form-group">
+                            <label for="boardCreateName">Name</label>
+                            <input type="text" class="form-control" id="boardCreateName" placeholder="Name">
+                        </div>
+                        <div class="form-group">
+                            <label for="boardCreateUsers">Board Users</label>
+                            <select class="select2bs4" multiple="multiple" data-placeholder="Select board users" id="boardCreateUsers" style="width: 100%;">
+                                @foreach ($users as $user)
+                                    <option value="{{$user['id']}}">{{$user['name']}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="boardCreateButton">Save board</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
     </section>
